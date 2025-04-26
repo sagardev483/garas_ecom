@@ -4,7 +4,9 @@ from PIL import Image
 from django.core.files import File
 from django.db import models
 
-class category(models.Model):
+base = 'http://127.0.0.1:8000'
+
+class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
@@ -14,8 +16,8 @@ class category(models.Model):
     class Meta:
         db_table = ''
         managed = True
-        verbose_name = 'ModelName'
-        verbose_name_plural = 'ModelNames'
+        verbose_name = 'Category'
+        
         ordering = ['name']
 
     def __str__(self):
@@ -25,8 +27,8 @@ class category(models.Model):
         return f'/{self.slug}/'
     
 
-class product(models.Model):
-    category = models.ForeignKey(category, on_delete=models.CASCADE, related_name='products')
+class Product(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
@@ -39,8 +41,8 @@ class product(models.Model):
     class Meta:
         db_table = ''
         managed = True
-        verbose_name = 'ModelName'
-        verbose_name_plural = 'ModelNames'
+        verbose_name = 'Product'
+
         ordering = ['-date_added']
         
     def __str__(self):
@@ -51,18 +53,18 @@ class product(models.Model):
     
     def get_image(self):
         if self.image:
-            return 'http://127.0.0.1:8000' + self.image.url
+            return base + self.image.url
         return ''
     
     def get_thumbnail(self):
         if self.thumbnail:
-            return 'http://127.0.0.1:8000' + self.thumbnail.url
+            return base + self.thumbnail.url
         else:
             if self.image:
                 self.thumbnail = self.create_thumbnail(self.image)
                 self.save()
                 
-                return 'http://127.0.0.1:8000' + self.thumbnail.url
+                return base + self.thumbnail.url
             else:
                 return ''
             
